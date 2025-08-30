@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Filter, Calendar, Tag } from 'lucide-react';
+import Button from './ui/Button';
 
 const SearchBar = ({ 
   searchQuery, 
@@ -54,36 +55,27 @@ const SearchBar = ({
 
       {/* Filter buttons */}
       <div className="hidden md:flex items-center space-x-2">
-        <button 
+        <Button 
+          variant={activeFilters.sortOrder === 'asc' ? 'primary' : 'ghost'}
           onClick={onFilterClick}
-          className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
-            activeFilters.sortOrder === 'asc' 
-              ? 'bg-primary-100 text-primary-700' 
-              : 'text-neutral-600 hover:bg-neutral-100'
-          }`}
+          className="flex items-center"
         >
           <Filter className="w-4 h-4 mr-2" />
           Sort {activeFilters.sortOrder === 'asc' ? '↑' : '↓'}
-        </button>
-        <button 
+        </Button>
+        <Button 
+          variant={activeFilters.dateRange ? 'secondary' : 'ghost'}
           onClick={onDateClick}
-          className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
-            activeFilters.dateRange 
-              ? 'bg-secondary-100 text-secondary-700' 
-              : 'text-neutral-600 hover:bg-neutral-100'
-          }`}
+          className="flex items-center"
         >
           <Calendar className="w-4 h-4 mr-2" />
           Date
           {activeFilters.dateRange && <span className="ml-1 w-2 h-2 bg-secondary-500 rounded-full"></span>}
-        </button>
-        <button 
+        </Button>
+        <Button 
+          variant={activeFilters.selectedTags?.length > 0 ? 'accent' : 'ghost'}
           onClick={onTagClick}
-          className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
-            activeFilters.selectedTags?.length > 0
-              ? 'bg-accent-100 text-accent-700' 
-              : 'text-neutral-600 hover:bg-neutral-100'
-          }`}
+          className="flex items-center"
         >
           <Tag className="w-4 h-4 mr-2" />
           Tags
@@ -92,7 +84,7 @@ const SearchBar = ({
               {activeFilters.selectedTags.length}
             </span>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

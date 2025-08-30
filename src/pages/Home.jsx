@@ -1,10 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import Sidebar from '../components/Sidebar';
 import SearchBar from '../components/SearchBar';
 import PhotoGrid from '../components/PhotoGrid';
 import UploadButton from '../components/UploadButton';
 import Notification from '../components/Notification';
 import PhotoModal from '../components/PhotoModal';
+import { usePhotoFilters } from '../hooks/usePhotoFilters';
+import { useSearch } from '../hooks/useSearch';
+import { useFilters } from '../hooks/useFilters';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 // Mock data for demonstration
 const mockPhotos = [
@@ -83,20 +87,13 @@ const mockPhotos = [
 ];
 
 const Home = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, handleSearchChange, clearSearch } = useSearch();
+  const { activeFilters, handleFilterClick, handleDateClick, handleTagClick, clearAllFilters } = useFilters();
   const [selectedSection, setSelectedSection] = useState('recent');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [photos, setPhotos] = useState(mockPhotos);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
-  
-  // Filter states
-  const [activeFilters, setActiveFilters] = useState({
-    dateRange: null, // { start: Date, end: Date }
-    selectedTags: [], // Array of selected tags
-    sortBy: 'date', // 'date', 'name', 'location'
-    sortOrder: 'desc' // 'asc', 'desc'
-  });
   
   const [notification, setNotification] = useState({
     isVisible: false,
@@ -105,85 +102,8 @@ const Home = () => {
     message: ''
   });
 
-  // Filter photos based on search query and active filters
-  const filteredPhotos = useMemo(() => {
-    let filtered = photos;
-
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(photo => 
-        photo.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        photo.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        photo.people.some(person => person.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-    }
-
-    // Filter by selected tags
-    if (activeFilters.selectedTags.length > 0) {
-      filtered = filtered.filter(photo => 
-        activeFilters.selectedTags.some(selectedTag => 
-          photo.tags.some(tag => tag.toLowerCase() === selectedTag.toLowerCase())
-        )
-      );
-    }
-
-    // Filter by date range
-    if (activeFilters.dateRange) {
-      const { start, end } = activeFilters.dateRange;
-      filtered = filtered.filter(photo => {
-        const photoDate = new Date(photo.date);
-        return photoDate >= start && photoDate <= end;
-      });
-    }
-
-    // Filter by section
-    switch (selectedSection) {
-      case 'favorites':
-        filtered = filtered.filter(photo => photo.isFavorite);
-        break;
-      case 'recent':
-        // Will be sorted below
-        break;
-      case 'people':
-        filtered = filtered.filter(photo => photo.people.length > 0);
-        break;
-      case 'places':
-        // Group by location, show all for now
-        break;
-      case 'albums':
-        // Show auto-generated albums
-        break;
-      default:
-        break;
-    }
-
-    // Apply sorting
-    filtered = filtered.sort((a, b) => {
-      let comparison = 0;
-      
-      switch (activeFilters.sortBy) {
-        case 'date':
-          comparison = new Date(a.date) - new Date(b.date);
-          break;
-        case 'name':
-          comparison = a.originalFilename?.localeCompare(b.originalFilename || '') || 0;
-          break;
-        case 'location':
-          comparison = a.location.localeCompare(b.location);
-          break;
-        default:
-          comparison = new Date(a.date) - new Date(b.date);
-      }
-      
-      return activeFilters.sortOrder === 'desc' ? -comparison : comparison;
-    });
-
-    return filtered;
-  }, [searchQuery, selectedSection, photos, activeFilters]);
-
-  const handleSearchChange = (query) => {
-    setSearchQuery(query);
-  };
+  // Use the custom hook for photo filtering
+  const filteredPhotos = usePhotoFilters(photos, searchQuery, selectedSection, activeFilters);
 
   const handleSectionChange = (section) => {
     setSelectedSection(section);
@@ -244,52 +164,6 @@ const Home = () => {
       'Upload Failed',
       `Failed to upload "${filename}": ${error.message}`
     );
-  };
-
-  const handleFilterClick = () => {
-    // Toggle sort order or show sort options
-    setActiveFilters(prev => ({
-      ...prev,
-      sortOrder: prev.sortOrder === 'desc' ? 'asc' : 'desc'
-    }));
-  };
-
-  const handleDateClick = () => {
-    // Create date filter options - last week, month, year, or custom range
-    const now = new Date();
-    const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
-    setActiveFilters(prev => ({
-      ...prev,
-      dateRange: prev.dateRange ? null : { start: lastWeek, end: now }
-    }));
-  };
-
-  const handleTagClick = () => {
-    // Get all unique tags from photos
-    const allTags = [...new Set(photos.flatMap(photo => photo.tags))];
-    
-    // For now, toggle the first common tag as an example
-    const commonTags = ['nature', 'pet', 'food', 'family'];
-    const tagToToggle = commonTags.find(tag => allTags.includes(tag)) || allTags[0];
-    
-    if (tagToToggle) {
-      setActiveFilters(prev => ({
-        ...prev,
-        selectedTags: prev.selectedTags.includes(tagToToggle)
-          ? prev.selectedTags.filter(tag => tag !== tagToToggle)
-          : [...prev.selectedTags, tagToToggle]
-      }));
-    }
-  };
-
-  const clearAllFilters = () => {
-    setActiveFilters({
-      dateRange: null,
-      selectedTags: [],
-      sortBy: 'date',
-      sortOrder: 'desc'
-    });
   };
 
   return (
@@ -357,7 +231,7 @@ const Home = () => {
             onSearchChange={handleSearchChange}
             onFilterClick={handleFilterClick}
             onDateClick={handleDateClick}
-            onTagClick={handleTagClick}
+            onTagClick={() => handleTagClick(photos)}
             activeFilters={activeFilters}
             onClearFilters={clearAllFilters}
             className="flex-1"
