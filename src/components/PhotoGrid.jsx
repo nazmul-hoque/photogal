@@ -3,7 +3,19 @@ import { Heart, MapPin } from 'lucide-react';
 import TagBadge from './TagBadge';
 
 const PhotoCard = ({ photo, onClick }) => (
-  <div className="photo-card group" onClick={() => onClick && onClick(photo)}>
+  <div 
+    className="photo-card group" 
+    onClick={() => onClick && onClick(photo)}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick && onClick(photo);
+      }
+    }}
+    role="button"
+    tabIndex={0}
+    aria-label={`Photo: ${photo.tags.join(', ')} taken at ${photo.location}`}
+  >
     <div className="relative">
       <img 
         src={photo.thumbnailUrl || photo.url} 
@@ -58,7 +70,7 @@ const PhotoGrid = ({
 
   if (photos.length === 0) {
     return (
-      <div className={`${className}`}>
+      <div className={`${className}`} role="region" aria-label={`${getSectionLabel(selectedSection)} section`}>
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-neutral-900 mb-2">
             {getSectionLabel(selectedSection)}
@@ -70,7 +82,7 @@ const PhotoGrid = ({
         
         <div className="text-center py-12">
           <div className="text-neutral-400 mb-4">
-            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
@@ -82,7 +94,7 @@ const PhotoGrid = ({
   }
 
   return (
-    <div className={`${className}`}>
+    <div className={`${className}`} role="region" aria-label={`${getSectionLabel(selectedSection)} section`}>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-neutral-900 mb-2">
           {getSectionLabel(selectedSection)}
@@ -94,7 +106,11 @@ const PhotoGrid = ({
       </div>
 
       {/* Photo Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div 
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+        role="grid"
+        aria-label={`${getSectionLabel(selectedSection)} photos`}
+      >
         {photos.map((photo) => (
           <PhotoCard key={photo.id} photo={photo} onClick={onPhotoClick} />
         ))}

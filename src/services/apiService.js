@@ -2,7 +2,9 @@
  * API service for photo uploads and analysis
  */
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+import { API_CONFIG, UPLOAD_CONFIG } from '../constants';
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 /**
  * Upload a single image file and get AI analysis
@@ -94,21 +96,18 @@ export async function uploadImages(files) {
  * @returns {Object} - Validation result
  */
 export function validateFile(file) {
-  const maxSize = 10 * 1024 * 1024; // 10MB
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-  
   if (!file) {
     return { isValid: false, message: 'No file selected' };
   }
   
-  if (file.size > maxSize) {
+  if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE) {
     return { 
       isValid: false, 
-      message: `File size too large. Maximum size is ${formatFileSize(maxSize)}` 
+      message: `File size too large. Maximum size is ${formatFileSize(UPLOAD_CONFIG.MAX_FILE_SIZE)}` 
     };
   }
   
-  if (!allowedTypes.includes(file.type)) {
+  if (!UPLOAD_CONFIG.ALLOWED_TYPES.includes(file.type)) {
     return { 
       isValid: false, 
       message: `Invalid file type. Allowed types: JPEG, PNG, GIF, WebP` 
