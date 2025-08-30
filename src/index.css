@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-neutral-50 text-neutral-900;
+  }
+  
+  * {
+    @apply scroll-smooth;
+  }
+}
+
+@layer components {
+  .photo-card {
+    @apply bg-white rounded-xl shadow-soft hover:shadow-soft-lg transition-all duration-300 overflow-hidden cursor-pointer;
+  }
+  
+  .photo-card:hover {
+    @apply transform scale-105;
+  }
+  
+  .tag-chip {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .sidebar-item {
+    @apply flex items-center px-4 py-3 text-neutral-700 hover:bg-primary-50 hover:text-primary-700 rounded-lg transition-colors cursor-pointer;
+  }
+  
+  .sidebar-item.active {
+    @apply bg-primary-100 text-primary-800 font-medium;
+  }
+}
