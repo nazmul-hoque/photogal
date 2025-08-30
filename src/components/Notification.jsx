@@ -63,12 +63,12 @@ const Notification = ({
   const IconComponent = styles.IconComponent;
 
   return (
-    <div className="fixed top-4 right-4 z-50 max-w-sm w-full">
+    <div className="fixed top-6 right-6 z-50 max-w-sm w-full animate-in slide-in-from-top-2">
       <div className={`
         ${styles.container} 
-        border rounded-lg shadow-lg p-4 
-        transform transition-all duration-300 ease-in-out
-        ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
+        border-2 rounded-2xl shadow-soft-lg p-5 backdrop-blur-sm
+        transform transition-all duration-500 ease-out
+        ${isVisible ? 'translate-x-0 opacity-100 scale-100' : 'translate-x-full opacity-0 scale-95'}
       `}>
         <div className="flex items-start">
           <div className="flex-shrink-0">

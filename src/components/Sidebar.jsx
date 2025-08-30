@@ -26,7 +26,12 @@ const Sidebar = ({
   const SidebarContent = () => (
     <div className="bg-white border-r border-neutral-200 h-full">
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-neutral-900 mb-8">PhotoGal</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-2">
+            PhotoGal
+          </h1>
+          <p className="text-sm text-neutral-500 font-medium">Smart Photo Organizer</p>
+        </div>
         <nav className="space-y-2">
           {sidebarSections.map((section) => {
             const Icon = section.icon;
@@ -37,13 +42,22 @@ const Sidebar = ({
                   onSectionChange(section.id);
                   if (onMobileMenuClose) onMobileMenuClose();
                 }}
-                className={`sidebar-item ${selectedSection === section.id ? 'active' : ''}`}
+                className={`sidebar-item group relative overflow-hidden ${selectedSection === section.id ? 'active' : ''}`}
               >
-                <Icon className="w-5 h-5 mr-3" />
-                <span className="flex-1">{section.label}</span>
-                <span className="text-sm bg-neutral-100 px-2 py-1 rounded-full">
-                  {section.count}
-                </span>
+                {/* Background gradient for active state */}
+                {selectedSection === section.id && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-xl" />
+                )}
+                
+                <div className="relative flex items-center">
+                  <div className="w-10 h-10 mr-3 rounded-lg bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center group-hover:from-primary-200 group-hover:to-secondary-200 transition-all duration-200">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="flex-1 font-medium">{section.label}</span>
+                  <span className="text-sm bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full font-semibold shadow-sm border border-white/50">
+                    {section.count}
+                  </span>
+                </div>
               </div>
             );
           })}

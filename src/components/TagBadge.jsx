@@ -29,7 +29,7 @@ const TagBadge = ({ tag, className = '' }) => {
   const colorClass = tagColors[tag] || 'bg-neutral-100 text-neutral-700';
   
   return (
-    <span className={`tag-chip ${colorClass} ${className}`}>
+    <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 hover:scale-105 border border-opacity-30 ${colorClass} ${className}`}>
       {tag}
     </span>
   );

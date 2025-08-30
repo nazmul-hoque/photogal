@@ -213,7 +213,7 @@ const Home = () => {
       </div>
 
       {/* Fixed Top Header Bar - spans full width at top of page */}
-      <header className="fixed top-0 left-0 right-0 bg-white border-b border-neutral-200 px-4 py-4 z-50 lg:left-64">
+      <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-neutral-200 px-4 py-4 z-50 lg:left-64">
         <div className="flex items-center justify-between">
           {/* Mobile menu button */}
           <button
@@ -245,17 +245,31 @@ const Home = () => {
         <main className="p-6">
           {/* Results indicator - only show when filters are active */}
           {(activeFilters.selectedTags.length > 0 || activeFilters.dateRange || searchQuery) && (
-            <div className="mb-3 flex items-center justify-between">
-              <div className="text-sm text-neutral-600">
-                Showing {filteredPhotos.length} of {photos.length} photos
-                <span className="ml-2 text-primary-600">• Filtered</span>
+            <div className="mb-6 p-4 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl border border-primary-100 animate-in slide-in-from-top-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                    <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-neutral-800">
+                      Showing <span className="text-primary-600 font-semibold">{filteredPhotos.length}</span> of <span className="text-neutral-600">{photos.length}</span> photos
+                    </p>
+                    <p className="text-xs text-neutral-500">Results filtered by your search criteria</p>
+                  </div>
+                </div>
+                <button
+                  onClick={clearAllFilters}
+                  className="inline-flex items-center px-3 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors duration-200"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Clear filters
+                </button>
               </div>
-              <button
-                onClick={clearAllFilters}
-                className="text-sm text-primary-600 hover:text-primary-700"
-              >image.png
-                Clear filters
-              </button>
             </div>
           )}
           
