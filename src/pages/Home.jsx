@@ -1,14 +1,16 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import SearchBar from '../components/SearchBar';
 import PhotoGrid from '../components/PhotoGrid';
 import UploadButton from '../components/UploadButton';
 import Notification from '../components/Notification';
 import PhotoModal from '../components/PhotoModal';
+import LocationDiscovery from '../components/LocationDiscovery';
+import TravelTimeline from '../components/TravelTimeline';
 import { usePhotoFilters } from '../hooks/usePhotoFilters';
 import { useSearch } from '../hooks/useSearch';
 import { useFilters } from '../hooks/useFilters';
-import ErrorBoundary from '../components/ErrorBoundary';
+// ErrorBoundary intentionally not used here to avoid wrapping the entire page
 
 // Mock data for demonstration
 const mockPhotos = [
@@ -18,6 +20,7 @@ const mockPhotos = [
     tags: ['beach', 'sunset', 'nature'],
     date: '2024-07-20',
     location: 'Malibu Beach',
+    coordinates: { lat: 34.0259, lng: -118.7798 },
     isFavorite: false,
     people: ['John', 'Sarah']
   },
@@ -27,6 +30,7 @@ const mockPhotos = [
     tags: ['dog', 'pet', 'golden retriever'],
     date: '2024-07-18',
     location: 'Central Park',
+    coordinates: { lat: 40.7829, lng: -73.9654 },
     isFavorite: true,
     people: []
   },
@@ -36,6 +40,7 @@ const mockPhotos = [
     tags: ['food', 'dinner', 'restaurant'],
     date: '2024-07-15',
     location: 'Downtown Restaurant',
+    coordinates: { lat: 34.0522, lng: -118.2437 },
     isFavorite: false,
     people: ['Mike', 'Lisa']
   },
@@ -45,6 +50,7 @@ const mockPhotos = [
     tags: ['nature', 'forest', 'hiking'],
     date: '2024-07-12',
     location: 'Yosemite National Park',
+    coordinates: { lat: 37.8651, lng: -119.5383 },
     isFavorite: true,
     people: ['John']
   },
@@ -54,6 +60,7 @@ const mockPhotos = [
     tags: ['family', 'birthday', 'celebration'],
     date: '2024-07-10',
     location: 'Home',
+    coordinates: { lat: 34.0522, lng: -118.2437 },
     isFavorite: false,
     people: ['Sarah', 'Mom', 'Dad']
   },
@@ -63,6 +70,7 @@ const mockPhotos = [
     tags: ['city', 'architecture', 'urban'],
     date: '2024-07-08',
     location: 'New York City',
+    coordinates: { lat: 40.7128, lng: -74.0060 },
     isFavorite: false,
     people: []
   },
@@ -72,6 +80,7 @@ const mockPhotos = [
     tags: ['code', 'work', 'programming'],
     date: '2024-07-05',
     location: 'Office',
+    coordinates: { lat: 34.0522, lng: -118.2437 },
     isFavorite: true,
     people: []
   },
@@ -81,13 +90,14 @@ const mockPhotos = [
     tags: ['cat', 'pet', 'cute'],
     date: '2024-07-03',
     location: 'Home',
+    coordinates: { lat: 34.0522, lng: -118.2437 },
     isFavorite: false,
     people: []
   }
 ];
 
 const Home = () => {
-  const { searchQuery, handleSearchChange, clearSearch } = useSearch();
+  const { searchQuery, handleSearchChange } = useSearch();
   const { activeFilters, handleFilterClick, handleDateClick, handleTagClick, clearAllFilters } = useFilters();
   const [selectedSection, setSelectedSection] = useState('recent');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -120,6 +130,13 @@ const Home = () => {
   const handlePhotoClick = (photo) => {
     setSelectedPhoto(photo);
     setIsPhotoModalOpen(true);
+  };
+
+  const handleTimelineSelect = (photo) => {
+    // Select photo in parent state (this will also be passed to GoogleMap)
+    setSelectedPhoto(photo);
+    // If you want opening modal on timeline select, uncomment next line
+    // setIsPhotoModalOpen(true);
   };
 
   const handleClosePhotoModal = () => {
@@ -273,12 +290,19 @@ const Home = () => {
             </div>
           )}
           
-          <PhotoGrid
-            photos={filteredPhotos}
-            selectedSection={selectedSection}
-            searchQuery={searchQuery}
-            onPhotoClick={handlePhotoClick}
-          />
+            {selectedSection === 'places' ? (
+            <div className="space-y-6">
+              <LocationDiscovery photos={filteredPhotos} />
+              <TravelTimeline photos={filteredPhotos} selectedPhoto={selectedPhoto} onPhotoSelect={handleTimelineSelect} isPhotoModalOpen={isPhotoModalOpen} />
+            </div>
+          ) : (
+            <PhotoGrid
+              photos={filteredPhotos}
+              selectedSection={selectedSection}
+              searchQuery={searchQuery}
+              onPhotoClick={handlePhotoClick}
+            />
+          )}
         </main>
       </div>
 
